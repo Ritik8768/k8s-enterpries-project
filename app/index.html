@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Kubernetes API</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .endpoints {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .endpoint:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .endpoint-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .endpoint-path {
+            color: #666;
+            font-family: monospace;
+        }
+        .response {
+            background: #1e293b;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            display: none;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .feature {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .feature-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Production Kubernetes API</h1>
+        <p class="subtitle">Enterprise-grade deployment with self-healing & auto-scaling</p>
+        <span class="status">✓ System Online</span>
+
+        <div class="endpoints">
+            <div class="endpoint" onclick="testEndpoint('/')">
+                <div class="endpoint-title">📋 API Info</div>
+                <div class="endpoint-path">GET /</div>
+            </div>
+            <div class="endpoint" onclick="testEndpoint('/health')">
+                <div class="endpoint-title">💚 Health Check</div>
+                <div class="endpoint-path">GET /health</div>
+            </div>
+            <div class="endpoint" onclick="testEndpoint('/ready')">
+                <div class="endpoint-title">✅ Readiness Check</div>
+                <div class="endpoint-path">GET /ready</div>
+            </div>
+            <div class="endpoint" onclick="testEndpoint('/api/data')">
+                <div class="endpoint-title">📊 API Data</div>
+                <div class="endpoint-path">GET /api/data</div>
+            </div>
+            <div class="endpoint" onclick="testEndpoint('/metrics')">
+                <div class="endpoint-title">📈 Metrics</div>
+                <div class="endpoint-path">GET /metrics</div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="testAll()">Test All Endpoints</button>
+        <button class="btn" onclick="clearResponse()">Clear</button>
+
+        <div id="response" class="response"></div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Self-Healing</div>
+                <div>Auto-restart on failure</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">Auto-Scaling</div>
+                <div>2-10 pods dynamic</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Secure</div>
+                <div>Non-root, policies</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Fast</div>
+                <div>&lt;200ms response</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        async function testEndpoint(path) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.style.display = 'block';
+            responseDiv.textContent = `Loading ${path}...`;
+
+            try {
+                const response = await fetch(API_BASE + path);
+                const data = await response.json();
+                responseDiv.textContent = `Response from ${path}:\n\n` + JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testAll() {
+            const endpoints = ['/', '/health', '/ready', '/api/data', '/metrics'];
+            const responseDiv = document.getElementById('response');
+            responseDiv.style.display = 'block';
+            responseDiv.textContent = 'Testing all endpoints...\n\n';
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(API_BASE + endpoint);
+                    const data = await response.json();
+                    responseDiv.textContent += `✓ ${endpoint}\n${JSON.stringify(data, null, 2)}\n\n`;
+                } catch (error) {
+                    responseDiv.textContent += `✗ ${endpoint}\nError: ${error.message}\n\n`;
+                }
+            }
+        }
+
+        function clearResponse() {
+            document.getElementById('response').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
