@@ -79,10 +79,4 @@ See [docs/GUIDE.md](docs/GUIDE.md) for detailed instructions.
 
 Pull requests welcome!
 
-## 📄 License
-
-MIT License
-
----
-
 **Built with ❤️ for Production Kubernetes**
